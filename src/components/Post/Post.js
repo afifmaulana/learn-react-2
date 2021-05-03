@@ -13,6 +13,7 @@ class Post extends Component {
                                     <img src="https://placeimg.com/1000/500/tech" />
                                     <h6 className="title mt-2">{this.props.data.title}</h6>
                                     <p className="desc">{this.props.data.body}</p>
+                                    <button className="btn btn-outline-warning mr-2" onClick={() => this.props.update(this.props.data)}>UPDATE</button>
                                     <button className="btn btn-outline-danger" onClick={() => this.props.remove(this.props.data.id)}>DELETE</button>
                                 </div>
                             </div>

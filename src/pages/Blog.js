@@ -13,7 +13,8 @@ class Blog extends Component {
             title: '',
             body: '',
             userId: 1
-        }
+        },
+        isUpdate: false
     }
     
     getAllPost = () => {
@@ -33,6 +34,31 @@ class Blog extends Component {
         })
     }
 
+    handleUpdate = (data) => {
+        console.log(data)
+        this.setState({
+            formPost: data,
+            isUpdate: true
+        })
+       
+    }
+
+    putData = () => {
+         axios.put(`http://localhost:3004/posts/${this.state.formPost.id}`).then((res) => {
+            console.log(res);
+            this.getAllPost()
+            this.setState({
+                isUpdate: false,
+                formPost: {
+                    id: 1,
+                    title: '',
+                    body: '',
+                    userId: 1
+                },
+            })
+        })
+    }
+
     handleRemove = (data) => {
         axios.delete(`http://localhost:3004/posts/${data}`).then((res) => {
             this.getAllPost()
@@ -42,7 +68,9 @@ class Blog extends Component {
     handleFormChange = (event) => {
         let formPostNew = {...this.state.formPost};
         let timestamp =  new Date().getTime();
-        formPostNew['id'] = timestamp;
+        if(!this.state.isUpdate){
+            formPostNew['id'] = timestamp;
+        }
         formPostNew[event.target.name] = event.target.value
         this.setState({
             formPost: formPostNew
@@ -51,7 +79,11 @@ class Blog extends Component {
     }
 
     handleSubmit = () => {
-        this.postData();
+        if(this.state.isUpdate){
+            this.putData();
+        }else{
+            this.postData();
+        }
     }
 
     componentDidMount() {
@@ -70,11 +102,11 @@ class Blog extends Component {
                             <div className="py-3 px-3">
                                 <div className="form-group">
                                     <label className="mr-3">TITLE</label>
-                                    <input type="text" className="form-control" id="title" name="title" placeholder="Enter Title Here" onChange={this.handleFormChange} />
+                                    <input type="text" className="form-control" id="title" name="title" value={this.state.formPost.title} placeholder="Enter Title Here" onChange={this.handleFormChange} />
                                 </div>
                                 <div className="form-group">
                                     <label className="mr-3">Desc</label>
-                                    <textarea type="text" className="form-control" id="body" name="body" placeholder="Enter Content Here" onChange={this.handleFormChange} />
+                                    <textarea type="text" className="form-control" id="body" name="body" value={this.state.formPost.body} placeholder="Enter Content Here" onChange={this.handleFormChange} />
                                 </div>
                                 <button className="btn btn-outline-primary float-right" onClick={this.handleSubmit}>Save</button>
                             </div>
@@ -83,7 +115,7 @@ class Blog extends Component {
                 </div>
                 {
                     this.state.post.map(post => {
-                        return <Post key={post.id} data={post} remove={this.handleRemove}/>
+                        return <Post key={post.id} data={post} remove={this.handleRemove} update={this.handleUpdate}/>
                     })
                 }
             </Fragment>
